@@ -1,0 +1,44 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "images/icon128.png",
+         "16": "images/icon16.png",
+         "48": "images/icon48.png"
+      },
+      "default_popup": "popup.html"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "commands": {
+      "_execute_action": {
+         "description": "打开搜索切换弹窗",
+         "suggested_key": {
+            "default": "Alt+S",
+            "mac": "Alt+S"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "css": [ "content.css" ],
+      "js": [ "content.js" ],
+      "matches": [ "*://*.google.com/search*", "*://*.google.com/imghp*", "*://*.google.com/images*", "*://*.google.com/videos*", "*://*.bing.com/search*", "*://*.bing.com/images*", "*://*.bing.com/videos*", "*://*.bing.com/news*", "*://*.baidu.com/s*", "*://image.baidu.com/*", "*://video.baidu.com/*", "*://*.zhihu.com/search*", "*://*.xiaohongshu.com/search*", "*://*.youtube.com/results*", "*://*.bilibili.com/search*", "*://search.bilibili.com/*", "*://*.douyin.com/search*", "*://s.taobao.com/search*", "*://s.taobao.com/*", "*://*.taobao.com/list/product*", "*://search.jd.com/Search*", "*://search.jd.com/*", "*://*.douban.com/search*", "*://movie.douban.com/subject_search*", "*://book.douban.com/subject_search*", "*://music.douban.com/subject_search*", "*://www.douban.com/subject_search*", "*://movie.douban.com/search/*", "*://book.douban.com/search/*", "*://music.douban.com/search/*", "*://search.smzdm.com/*", "*://*.smzdm.com/search*" ]
+   } ],
+   "description": "在不同搜索平台之间轻松切换搜索关键词",
+   "host_permissions": [ "*://*.google.com/*", "*://*.bing.com/*", "*://*.baidu.com/*", "*://*.zhihu.com/*", "*://*.xiaohongshu.com/*", "*://*.youtube.com/*", "*://*.bilibili.com/*", "*://search.bilibili.com/*", "*://*.douyin.com/*", "*://*.taobao.com/*", "*://s.taobao.com/*", "*://*.jd.com/*", "*://search.jd.com/*", "*://*.douban.com/*", "*://movie.douban.com/*", "*://book.douban.com/*", "*://music.douban.com/*", "*://*.smzdm.com/*", "*://search.smzdm.com/*" ],
+   "icons": {
+      "128": "images/icon128.png",
+      "16": "images/icon16.png",
+      "48": "images/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmckjOTOHY7AbO4cGjZ/2b2+0gwaNrmsGdqGA+A+G5HDmwDRLEXa3czjSIIGQwromSTm2SS+2JCY/12muz3nLLau4AVnB8dVnuFeaeZC9n7UV7sijSW0NlLay+oy2OewVO1s/LwPaW9ZjSWeno+aUXVFnwdZ6XI65mmW7YZRpZkpRLr2UmOZCnrz7j7m2C3sgteEV52ikOb/h2UCqOu8Nq0r4fSK88Bmfa0q++ZPhcTZbGDZjr9Rq8XVMzg/axi0hUrUXmj6GWFQgVDTnS/0kA8uoPx+9Zfn5Jl5VNXl0YPZNXbbE8PccZgA2tuEkPtlLLVGqmg8SUqYLLbVdXsCF5wIDAQAB",
+   "manifest_version": 3,
+   "name": "搜索切换",
+   "permissions": [ "storage", "activeTab" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.0",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "icon/*.svg", "icon/*.png", "images/*.svg", "images/*.png", "popup.html" ]
+   } ]
+}

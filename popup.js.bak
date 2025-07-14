@@ -1,0 +1,538 @@
+// 默认搜索平台配置
+const defaultPlatforms = {
+  "search-engines": [
+    {
+      id: "google",
+      name: "Google",
+      iconUrl: "icon/google.svg",
+      urlTemplate: "https://www.google.com/search?q={searchTerm}",
+      searchParam: "q",
+      urlPattern: "*://www.google.com/search*"
+    },
+    {
+      id: "bing",
+      name: "Bing",
+      iconUrl: "icon/bing.svg",
+      urlTemplate: "https://www.bing.com/search?q={searchTerm}",
+      searchParam: "q",
+      urlPattern: "*://www.bing.com/search*"
+    },
+    {
+      id: "baidu",
+      name: "百度",
+      iconUrl: "icon/Baidu.svg",
+      urlTemplate: "https://www.baidu.com/s?wd={searchTerm}",
+      searchParam: "wd",
+      urlPattern: "*://www.baidu.com/s*"
+    },
+    {
+      id: "zhihu",
+      name: "知乎",
+      iconUrl: "icon/知乎.svg",
+      urlTemplate: "https://www.zhihu.com/search?q={searchTerm}",
+      searchParam: "q",
+      urlPattern: "*://www.zhihu.com/search*"
+    }
+  ],
+  "video-platforms": [
+    {
+      id: "youtube",
+      name: "YouTube",
+      iconUrl: "icon/Youtube.svg",
+      urlTemplate: "https://www.youtube.com/results?search_query={searchTerm}",
+      searchParam: "search_query",
+      urlPattern: "*://www.youtube.com/results*"
+    },
+    {
+      id: "bilibili",
+      name: "哔哩哔哩",
+      iconUrl: "icon/bilibili.svg",
+      urlTemplate: "https://search.bilibili.com/all?keyword={searchTerm}",
+      searchParam: "keyword",
+      urlPattern: "*://search.bilibili.com/*"
+    }
+  ],
+  "social-platforms": [
+    {
+      id: "xiaohongshu",
+      name: "小红书",
+      iconUrl: "icon/小红书.svg",
+      urlTemplate: "https://www.xiaohongshu.com/search_result?keyword={searchTerm}",
+      searchParam: "keyword",
+      urlPattern: "*://www.xiaohongshu.com/search_result*"
+    },
+    {
+      id: "douyin",
+      name: "抖音",
+      iconUrl: "icon/抖音.svg",
+      urlTemplate: "https://www.douyin.com/search/{searchTerm}",
+      searchParam: null, // 抖音搜索关键词在路径中，而不是查询参数
+      urlPattern: "*://www.douyin.com/search/*"
+    }
+  ],
+  "custom-platforms": []
+};
+
+// 当前搜索关键词和平台ID
+let currentSearchTerm = '';
+let currentPlatformId = '';
+
+// 初始化时加载数据
+document.addEventListener('DOMContentLoaded', async () => {
+  // 从存储中获取自定义平台
+  const data = await chrome.storage.local.get('customPlatforms');
+  const customPlatforms = data.customPlatforms || [];
+  
+  // 合并自定义平台
+  defaultPlatforms['custom-platforms'] = customPlatforms;
+  
+  // 从active tab获取当前平台和搜索词
+  await getCurrentPlatformAndSearchTerm();
+  
+  // 渲染平台列表
+  renderPlatforms();
+  
+  // 设置事件监听器
+  setupEventListeners();
+});
+
+// 获取当前标签页的平台和搜索词
+async function getCurrentPlatformAndSearchTerm() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const url = new URL(tab.url);
+    
+    // 查找当前平台
+    for (const category in defaultPlatforms) {
+      for (const platform of defaultPlatforms[category]) {
+        // 检查URL是否匹配平台模式
+        if (matchUrlPattern(tab.url, platform.urlPattern)) {
+          currentPlatformId = platform.id;
+          
+          // 提取搜索关键词
+          if (platform.searchParam) {
+            // 从查询参数中提取
+            currentSearchTerm = url.searchParams.get(platform.searchParam) || '';
+          } else if (platform.id === 'douyin') {
+            // 抖音特殊处理：从URL路径中提取
+            const pathParts = url.pathname.split('/');
+            if (pathParts.length > 2 && pathParts[1] === 'search') {
+              currentSearchTerm = decodeURIComponent(pathParts[2]);
+            }
+          }
+          
+          return;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('获取当前标签页信息失败:', error);
+  }
+}
+
+// 匹配URL模式
+function matchUrlPattern(url, pattern) {
+  const regexPattern = pattern
+    .replace(/\./g, '\\.')
+    .replace(/\*/g, '.*');
+  
+  return new RegExp(regexPattern).test(url);
+}
+
+// 渲染所有平台
+function renderPlatforms() {
+  // 渲染当前平台
+  renderCurrentPlatform();
+  
+  // 渲染各类别平台
+  for (const category in defaultPlatforms) {
+    const containerElement = document.getElementById(category);
+    if (!containerElement) continue;
+    
+    containerElement.innerHTML = '';
+    
+    for (const platform of defaultPlatforms[category]) {
+      const platformElement = createPlatformElement(platform);
+      containerElement.appendChild(platformElement);
+    }
+  }
+}
+
+// 渲染当前平台
+function renderCurrentPlatform() {
+  const container = document.getElementById('current-platform-item');
+  container.innerHTML = '';
+  
+  if (!currentPlatformId) {
+    container.textContent = '未识别到搜索平台';
+    return;
+  }
+  
+  // 查找当前平台对象
+  let currentPlatform = null;
+  for (const category in defaultPlatforms) {
+    currentPlatform = defaultPlatforms[category].find(p => p.id === currentPlatformId);
+    if (currentPlatform) break;
+  }
+  
+  if (!currentPlatform) {
+    container.textContent = '未识别到搜索平台';
+    return;
+  }
+  
+  // 创建简单的平台显示元素（只有图标和名称，没有选中状态）
+  const element = document.createElement('div');
+  element.className = 'platform-display';
+  
+  const iconElement = document.createElement('img');
+  iconElement.className = 'platform-icon';
+  iconElement.src = currentPlatform.iconUrl;
+  iconElement.alt = currentPlatform.name;
+  
+  const nameElement = document.createElement('span');
+  nameElement.className = 'platform-name';
+  nameElement.textContent = currentPlatform.name;
+  
+  element.appendChild(iconElement);
+  element.appendChild(nameElement);
+  
+  container.appendChild(element);
+}
+
+// 创建平台元素
+function createPlatformElement(platform, isCurrent = false) {
+  const element = document.createElement('div');
+  element.className = `platform-item`;
+  element.dataset.id = platform.id;
+  element.dataset.urlTemplate = platform.urlTemplate;
+  
+  // 定义是否为自定义平台
+  const isCustom = platform.id.startsWith('custom-');
+  
+  // 平台内容容器
+  const contentElement = document.createElement('div');
+  contentElement.className = 'platform-content';
+  
+  const iconElement = document.createElement('img');
+  iconElement.className = 'platform-icon';
+  iconElement.src = platform.iconUrl;
+  iconElement.alt = platform.name;
+  
+  const nameElement = document.createElement('span');
+  nameElement.className = 'platform-name';
+  nameElement.textContent = platform.name;
+  
+  contentElement.appendChild(iconElement);
+  contentElement.appendChild(nameElement);
+  
+  // 为自定义平台添加操作按钮
+  if (isCustom) {
+    const actionsElement = document.createElement('div');
+    actionsElement.className = 'platform-actions';
+    
+    const editButton = document.createElement('button');
+    editButton.className = 'action-btn edit-btn';
+    editButton.innerHTML = '编辑';
+    editButton.title = '编辑';
+    editButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editCustomPlatform(platform);
+    });
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'action-btn delete-btn';
+    deleteButton.innerHTML = '删除';
+    deleteButton.title = '删除';
+    deleteButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteCustomPlatform(platform);
+    });
+    
+    actionsElement.appendChild(editButton);
+    actionsElement.appendChild(deleteButton);
+    element.appendChild(actionsElement);
+  }
+  
+  element.appendChild(contentElement);
+  
+  if (!isCurrent) {
+    element.addEventListener('click', () => switchPlatform(platform));
+  }
+  
+  return element;
+}
+
+// 切换到指定平台
+async function switchPlatform(platform) {
+  if (!currentSearchTerm || currentPlatformId === platform.id) return;
+  
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    // 在URL模板中替换搜索词
+    const targetUrl = platform.urlTemplate.replace('{searchTerm}', encodeURIComponent(currentSearchTerm));
+    
+    // 导航到目标URL
+    await chrome.tabs.update(tab.id, { url: targetUrl });
+    
+    // 关闭弹出窗口
+    window.close();
+  } catch (error) {
+    console.error('切换平台失败:', error);
+  }
+}
+
+// 设置事件监听器
+function setupEventListeners() {
+  // 添加自定义平台按钮
+  const addCustomPlatformBtn = document.getElementById('add-custom-platform');
+  addCustomPlatformBtn.addEventListener('click', () => {
+    // 重置表单
+    resetCustomPlatformForm();
+    
+    // 显示表单
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('custom-platform-form').style.display = 'block';
+    
+    // 确保保存按钮是添加模式
+    const saveButton = document.getElementById('save-platform');
+    saveButton.textContent = '保存';
+    saveButton.dataset.mode = 'add';
+    saveButton.onclick = saveCustomPlatform;
+  });
+  
+  // 返回按钮
+  const backBtn = document.getElementById('back-btn');
+  backBtn.addEventListener('click', resetCustomPlatformForm);
+  
+  // 保存自定义平台
+  const savePlatformBtn = document.getElementById('save-platform');
+  savePlatformBtn.addEventListener('click', saveCustomPlatform);
+}
+
+// 保存自定义平台
+async function saveCustomPlatform() {
+  // 如果是编辑模式，则调用updateCustomPlatform
+  if (this.dataset && this.dataset.mode === 'edit' && this.dataset.editId) {
+    await updateCustomPlatform(this.dataset.editId);
+    return;
+  }
+  
+  const nameInput = document.getElementById('platform-name');
+  const urlInput = document.getElementById('platform-url');
+  const categorySelect = document.getElementById('platform-category');
+  const iconInput = document.getElementById('platform-icon');
+  
+  const name = nameInput.value.trim();
+  const urlTemplate = urlInput.value.trim();
+  const category = categorySelect.value;
+  
+  // 验证输入
+  if (!name || !urlTemplate) {
+    alert('请填写平台名称和URL模板');
+    return;
+  }
+  
+  if (!urlTemplate.includes('{searchTerm}')) {
+    alert('URL模板必须包含 {searchTerm} 占位符');
+    return;
+  }
+  
+  // 生成唯一ID
+  const id = `custom-${Date.now()}`;
+  
+  // 读取图标（如果上传）
+  let iconUrl = 'images/icon.svg'; // 默认图标
+  if (iconInput.files.length > 0) {
+    const file = iconInput.files[0];
+    iconUrl = await readFileAsDataURL(file);
+  }
+  
+  // 创建自定义平台对象
+  const customPlatform = {
+    id,
+    name,
+    iconUrl,
+    urlTemplate,
+    searchParam: null, // 自定义平台使用模板替换，不需要搜索参数
+    urlPattern: null
+  };
+  
+  // 更新本地数据
+  const data = await chrome.storage.local.get('customPlatforms');
+  const customPlatforms = data.customPlatforms || [];
+  customPlatforms.push(customPlatform);
+  
+  // 保存到存储
+  await chrome.storage.local.set({ customPlatforms });
+  
+  // 更新界面
+  defaultPlatforms['custom-platforms'] = customPlatforms;
+  renderPlatforms();
+  
+  // 重置表单并返回主界面
+  resetCustomPlatformForm();
+}
+
+// 读取文件为 Data URL
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// 编辑自定义平台
+async function editCustomPlatform(platform) {
+  // 设置表单为编辑模式
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('custom-platform-form').style.display = 'block';
+  
+  // 设置保存按钮为编辑模式
+  const saveButton = document.getElementById('save-platform');
+  saveButton.textContent = '更新';
+  saveButton.dataset.mode = 'edit';
+  saveButton.dataset.editId = platform.id;
+  
+  // 填充表单
+  document.getElementById('platform-name').value = platform.name;
+  document.getElementById('platform-url').value = platform.urlTemplate;
+  
+  // 选择对应的分类
+  for (const category in defaultPlatforms) {
+    const found = defaultPlatforms[category].find(p => p.id === platform.id);
+    if (found) {
+      document.getElementById('platform-category').value = category;
+      break;
+    }
+  }
+  
+  // 监听保存按钮的点击事件
+  saveButton.onclick = async function() {
+    await updateCustomPlatform(platform.id);
+  };
+}
+
+// 更新自定义平台
+async function updateCustomPlatform(platformId) {
+  const nameInput = document.getElementById('platform-name');
+  const urlInput = document.getElementById('platform-url');
+  const categorySelect = document.getElementById('platform-category');
+  const iconInput = document.getElementById('platform-icon');
+  
+  const name = nameInput.value.trim();
+  const urlTemplate = urlInput.value.trim();
+  const category = categorySelect.value;
+  
+  // 验证输入
+  if (!name || !urlTemplate) {
+    alert('请填写平台名称和URL模板');
+    return;
+  }
+  
+  if (!urlTemplate.includes('{searchTerm}')) {
+    alert('URL模板必须包含 {searchTerm} 占位符');
+    return;
+  }
+  
+  // 获取所有自定义平台
+  const data = await chrome.storage.local.get('customPlatforms');
+  const customPlatforms = data.customPlatforms || [];
+  
+  // 找到要更新的平台索引
+  const platformIndex = customPlatforms.findIndex(p => p.id === platformId);
+  if (platformIndex === -1) {
+    alert('找不到要编辑的平台');
+    return;
+  }
+  
+  // 准备要更新的数据
+  const updatedPlatform = {
+    ...customPlatforms[platformIndex],
+    name,
+    urlTemplate,
+  };
+  
+  // 如果上传了新图标，则更新图标
+  if (iconInput.files.length > 0) {
+    const file = iconInput.files[0];
+    updatedPlatform.iconUrl = await readFileAsDataURL(file);
+  }
+  
+  // 更新数据
+  customPlatforms[platformIndex] = updatedPlatform;
+  await chrome.storage.local.set({ customPlatforms });
+  
+  // 如果更改了分类，需要移动平台到新分类
+  for (const cat in defaultPlatforms) {
+    if (cat !== 'custom-platforms') {
+      const index = defaultPlatforms[cat].findIndex(p => p.id === platformId);
+      if (index !== -1) {
+        // 从旧分类中移除
+        defaultPlatforms[cat].splice(index, 1);
+      }
+    }
+  }
+  
+  // 更新界面的数据
+  defaultPlatforms['custom-platforms'] = customPlatforms;
+  
+  // 重新渲染平台列表
+  renderPlatforms();
+  
+  // 重置表单
+  resetCustomPlatformForm();
+}
+
+// 删除自定义平台
+async function deleteCustomPlatform(platform) {
+  if (!confirm(`确定要删除 "${platform.name}" 平台吗？`)) {
+    return;
+  }
+  
+  // 获取所有自定义平台
+  const data = await chrome.storage.local.get('customPlatforms');
+  const customPlatforms = data.customPlatforms || [];
+  
+  // 找到要删除的平台索引
+  const platformIndex = customPlatforms.findIndex(p => p.id === platform.id);
+  if (platformIndex === -1) {
+    alert('找不到要删除的平台');
+    return;
+  }
+  
+  // 从数组中移除
+  customPlatforms.splice(platformIndex, 1);
+  
+  // 保存更新后的数据
+  await chrome.storage.local.set({ customPlatforms });
+  
+  // 更新界面的数据
+  defaultPlatforms['custom-platforms'] = customPlatforms;
+  
+  // 重新渲染平台列表
+  renderPlatforms();
+}
+
+// 重置自定义平台表单
+function resetCustomPlatformForm() {
+  // 重置输入字段
+  document.getElementById('platform-name').value = '';
+  document.getElementById('platform-url').value = '';
+  document.getElementById('platform-icon').value = '';
+  
+  // 重置保存按钮
+  const saveButton = document.getElementById('save-platform');
+  saveButton.textContent = '保存';
+  saveButton.dataset.mode = 'add';
+  delete saveButton.dataset.editId;
+  
+  // 恢复保存按钮的原始事件处理
+  saveButton.onclick = saveCustomPlatform;
+  
+  // 返回主界面
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('custom-platform-form').style.display = 'none';
+} 

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>搜索切换</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <div id="current-platform">
+      <h3>当前平台</h3>
+      <div id="current-platform-item"></div>
+    </div>
+    
+    <div class="platform-section">
+      <div class="platform-list" id="all-platforms"></div>
+    </div>
+    
+    <!-- 底部设置按钮 -->
+    <div class="footer">
+      <div class="settings-icon" id="settings-btn">
+        <img src="icon/setting.svg" alt="设置">
+      </div>
+    </div>
+    
+    <!-- 设置弹出菜单 -->
+    <div id="settings-popup" class="settings-popup" style="display: none;">
+      <div class="settings-item">
+        <div class="settings-item-label">
+          <span>新开标签页</span>
+        </div>
+        <div class="settings-item-control" id="new-tab-switch">
+          <img src="icon/switch-off.svg" alt="开关" id="new-tab-switch-img">
+        </div>
+      </div>
+      
+      <button id="add-platform-btn" class="add-btn">添加自定义搜索</button>
+    </div>
+  </div>
+  
+  <div id="custom-platform-form" style="display: none;">
+    <div class="form-header">
+      <button id="back-btn">
+        <img src="icon/arrow-left.svg" alt="返回" class="back-icon">
+      </button>
+      <h3>添加自定义平台</h3>
+    </div>
+    
+    <div class="form-group">
+      <label for="platform-name">平台名称</label>
+      <input type="text" id="platform-name" placeholder="例如: Twitter" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="platform-url">URL 模板</label>
+      <input type="text" id="platform-url" placeholder="例如: https://twitter.com/search?q={searchTerm}" required>
+      <small>使用 {searchTerm} 表示搜索关键词的位置</small>
+    </div>
+    
+    <div class="form-group">
+      <label for="platform-icon">图标 (可选)</label>
+      <input type="file" id="platform-icon" accept="image/*">
+    </div>
+    
+    <div class="button-group">
+      <button id="delete-platform" class="delete-btn" style="display: none;">删除</button>
+      <button id="save-platform" class="primary-btn">保存</button>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html> 

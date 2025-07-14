@@ -1,0 +1,541 @@
+:root {
+  --primary-color: #2ECD76;
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #eeeeee;
+  --hover-color: #f5f5f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #222222;
+    --text-color: #f0f0f0;
+    --border-color: #444444;
+    --hover-color: #333333;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  width: 320px;
+  min-height: 400px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+#app, #custom-platform-form {
+  padding: 16px 12px;
+}
+
+h3 {
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.platform-section {
+  margin-bottom: 20px;
+}
+
+.platform-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  padding-top: 8px;
+}
+
+.platform-item {
+  display: flex;
+  align-items: center;
+  padding: 7px 12px 7px 4px;
+  border-radius: 8px;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  flex: 0 0 calc(50% - 6px);
+  box-sizing: border-box;
+  width: calc(50% - 6px);
+}
+
+.platform-item:hover {
+  background-color: var(--hover-color);
+}
+
+.platform-item.current {
+  border-color: var(--primary-color);
+  background-color: rgba(46, 205, 118, 0.1);
+}
+
+.platform-item.dragging {
+  opacity: 0.7;
+  border: 1px dashed var(--primary-color);
+  background-color: rgba(46, 205, 118, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.platform-item.drag-over {
+  border: 2px dashed var(--primary-color);
+  background-color: rgba(46, 205, 118, 0.08);
+}
+
+.platform-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+}
+
+.platform-name {
+  font-size: 14px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 16ch;
+}
+
+.platform-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.platform-actions {
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.platform-item:hover .platform-actions {
+  display: flex;
+  opacity: 1;
+}
+
+.action-btn {
+  border: none;
+  background: none;
+  color: transparent;
+  cursor: pointer;
+  min-width: 28px;
+  height: 24px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.platform-item:hover .action-btn {
+  color: #999;
+}
+
+.action-btn:hover {
+  background-color: var(--hover-color);
+}
+
+.edit-btn:hover {
+  color: var(--primary-color);
+}
+
+.delete-btn:hover {
+  color: #ff6b6b;
+}
+
+/* 按钮样式基础类 */
+.btn-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  box-sizing: border-box;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+/* 常见动画效果 */
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 应用基础类到现有按钮 */
+.add-btn {
+  composes: btn-base;
+  border: 1px dashed var(--border-color);
+  color: var(--primary-color);
+  margin-top: 8px;
+  width: 100%;
+}
+
+.add-btn:hover {
+  background-color: rgba(46, 205, 118, 0.08);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(46, 205, 118, 0.15);
+}
+
+.primary-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 2;
+}
+
+.delete-btn {
+  padding: 8px 8px;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 1;
+}
+
+.delete-btn:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#back-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin-right: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.back-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: currentColor;
+}
+
+.form-header h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 13px;
+}
+
+small {
+  display: block;
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+}
+
+#current-platform {
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+#current-platform h3 {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #999;
+}
+
+.platform-display {
+  display: flex;
+  align-items: center;
+  padding: 7px 12px 7px 4px;
+  background-color: var(--background-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  background-color: rgba(46, 205, 118, 0.08);
+}
+
+.platform-display .platform-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+}
+
+.platform-display .platform-name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 16ch;
+}
+
+.drag-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  color: #999;
+  font-size: 16px;
+  cursor: grab;
+  user-select: none;
+}
+
+.edit-icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+/* 底部设置按钮样式 */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start;
+  background-color: var(--background-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.settings-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.settings-icon:hover {
+  opacity: 1;
+}
+
+.settings-icon img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 设置弹出菜单样式 */
+.settings-popup {
+  position: absolute;
+  bottom: 50px;
+  left: 10px;
+  min-width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  z-index: 100;
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-popup {
+    background-color: #333333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.settings-popup .settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: none;
+  padding: 5px 0;
+}
+
+.settings-popup .settings-item-label {
+  flex-direction: row;
+}
+
+.settings-popup .settings-item-label span {
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.settings-popup .add-btn {
+  width: 100%;
+  margin-top: 5px;
+  border: 1px solid var(--border-color);
+  background-color: white;
+  color: var(--text-color);
+  font-weight: normal;
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-popup .add-btn {
+    background-color: #444444;
+    border-color: #555555;
+  }
+}
+
+.settings-popup .add-btn:hover {
+  background-color: var(--hover-color);
+  transform: none;
+  box-shadow: none;
+  border-color: var(--border-color);
+}
+
+/* 调整主界面底部边距，防止内容被footer遮挡 */
+#app {
+  padding-bottom: 50px;
+}
+
+.settings-item-control {
+  cursor: pointer;
+  padding: 5px;
+  min-width: 50px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-item-control::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  bottom: -5px;
+  left: -5px;
+  z-index: 1;
+}
+
+.settings-item-control img {
+  width: 40px;
+  height: 22px;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              opacity 0.3s ease, 
+              filter 0.3s ease;
+  position: relative;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.settings-item-control.active img {
+  transform: scale(1.1);
+}
+
+.settings-item-control:hover img {
+  filter: brightness(1.1);
+}
+
+.settings-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 10px 0;
+  width: 100%;
+}
+
+.restore-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 4px 4px 4px;
+  border-radius: 6px;
+  background-color: var(--background-color);
+  border: 1px dashed #ff9800;
+  color: #ff9800;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.restore-btn:hover {
+  background-color: rgba(255, 152, 0, 0.08);
+  border-color: #ff9800;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.15);
+}
+
+.restore-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+}
+
+.delete-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.small-text {
+  font-size: 11px;
+  color: #999;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* 平台操作按钮样式 */
+.action-btn.restore-btn:hover {
+  color: #ff9800;
+}
+
+.action-btn.delete-btn:hover {
+  color: #ff5252;
+} 
