@@ -24,7 +24,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   width: 320px;
-  min-height: 400px;
+  min-height: 300px;
   background-color: var(--background-color);
   color: var(--text-color);
   overflow-x: hidden;
@@ -153,6 +153,14 @@ h3 {
 }
 
 .edit-btn:hover {
+  color: var(--primary-color);
+}
+
+.add-btn:hover {
+  color: var(--primary-color);
+}
+
+.home-btn:hover {
   color: var(--primary-color);
 }
 
@@ -321,6 +329,8 @@ small {
 }
 
 .drag-icon {
+  visibility: collapse;
+	
   width: 16px;
   height: 16px;
   display: flex;
@@ -333,7 +343,27 @@ small {
   user-select: none;
 }
 
+.home-icon {
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+	display: flex;
+	align-items:center;
+}
+
+.add-icon {
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+	display: flex;
+	align-items:center;
+}
+
+
+
 .edit-icon {
+  visibility: collapse;
+
   width: 14px;
   height: 14px;
   display: block;
@@ -347,6 +377,8 @@ small {
 
 /* 底部设置按钮样式 */
 .footer {
+  visibility: collapse;
+	
   position: fixed;
   bottom: 0;
   left: 0;

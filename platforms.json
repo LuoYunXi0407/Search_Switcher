@@ -1,0 +1,66 @@
+[
+	{
+		"id": "google",
+		"name": "Google",
+		"iconUrl": "icon/google.svg",
+		"urlTemplate": "https://www.google.com/search?q={searchTerm}",
+		"searchParam": "q",
+		"matchDomains": ["www.google.com", "www.google.com.hk"],
+		"homePage": "https://www.google.com"
+	},
+	{
+		"id": "bing",
+		"name": "Bing",
+		"iconUrl": "icon/bing.svg",
+		"urlTemplate": "https://www.bing.com/search?q={searchTerm}",
+		"searchParam": "q",
+		"matchDomains": ["www.bing.com", "cn.bing.com"],
+		"homePage": "https://www.bing.com"
+	},
+	{
+		"id": "baidu",
+		"name": "百度",
+		"iconUrl": "icon/Baidu.svg",
+		"urlTemplate": "https://www.baidu.com/s?wd={searchTerm}",
+		"searchParam": "wd",
+		"matchDomains": ["www.baidu.com"],
+		"homePage": "https://www.baidu.com"
+	},
+	{
+		"id": "360",
+		"name": "360",
+		"iconUrl": "icon/360.ico",
+		"urlTemplate": "https://www.so.com/s?q={searchTerm}",
+		"searchParam": "q",
+		"matchDomains": ["www.so.com"],
+		"homePage": "https://www.so.com"
+	},
+	{
+		"id": "sogou",
+		"name": "搜狗",
+		"iconUrl": "icon/sogou.ico",
+		"urlTemplate": "https://www.sogou.com/web?query={searchTerm}",
+		"searchParam": "query",
+		"matchDomains": ["www.sogou.com"],
+		"homePage": "https://www.sogou.com"
+	},
+	{
+		"id": "yahoo",
+		"name": "Yahoo",
+		"iconUrl": "icon/yahoo.ico",
+		"urlTemplate": "https://search.yahoo.com/search?p={searchTerm}",
+		"searchParam": "p",
+		"matchDomains": ["search.yahoo.com"],
+		"homePage": "https://search.yahoo.com"
+	},
+	{
+		"id": "duckduckgo",
+		"name": "DuckDuckGo",
+		"iconUrl": "icon/duckduckgo.ico",
+		"urlTemplate": "https://duckduckgo.com/?q={searchTerm}",
+		"searchParam": "p",
+		"matchDomains": ["duckduckgo.com"],
+		"homePage": "https://duckduckgo.com"
+		
+	}
+]

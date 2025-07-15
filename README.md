@@ -1,96 +1,80 @@
-# 搜索切换
+This repository is based on code provided by @lshchong, with permission by email. 
 
-## 简介
-搜索切换是一个Chrome浏览器扩展，允许用户在不同搜索平台之间轻松切换相同的搜索关键词。用户可以一键从当前搜索平台（如Google、百度、知乎等）跳转到另一个平台，无需重新输入搜索词。
+Email permission received on 2025-07-01. 
 
-## 主要功能
+You can find the original version in [Chrome Extensions Store](https://chromewebstore.google.com/detail/%E6%90%9C%E7%B4%A2%E5%88%87%E6%8D%A2/ihpjccbjnfcbipmmjhphfdcpdfddpjgd).
+ 
+Modifications made by [@LuoYunXi](https://github.com/LuoYunXi0407).
 
-### 默认搜索平台支持
-- Google
-- Bing
-- 百度
-- 知乎
-- YouTube
-- 哔哩哔哩
-- 小红书
-- 抖音
-- 淘宝
-- 京东
-- 豆瓣
+For a brief introduction to the changes from the original version, see the [Chinese README](./README-zh.md). ~~I don't want to write the English version or just translate them into English now. I'm so tired these days.~~
 
-### 核心功能
-1. **一键切换搜索平台**：保留相同搜索词，轻松在不同平台间切换
-2. **自定义搜索平台**：添加、编辑和删除自定义搜索平台
-3. **平台排序**：通过拖拽调整平台显示顺序
-4. **自定义图标**：为自定义平台上传专属图标
-5. **悬浮入口**：可拖拽的浏览器边缘悬浮按钮，方便随时调用
-6. **新标签页打开**：可选择在新标签页或当前标签页打开搜索结果
-7. **平台编辑**：支持编辑和恢复所有平台，包括默认平台
-8. **平台恢复**：支持恢复已删除的默认平台
-9. **平滑动画**：切换开关和界面操作时有流畅的动画效果
+The original README (in Chinese) by the original author can be found in the end of the [Chinese README](./README-zh.md)。
 
-## 使用说明
+---
 
-### 基本使用
-1. 在任何支持的搜索网站上进行搜索
-2. 点击扩展图标打开搜索切换面板
-3. 当前搜索平台将显示在顶部，支持的其他平台列在下方
-4. 点击任意平台图标，即可跳转到该平台并使用相同的搜索词
+# Search Switcher
 
-### 切换新标签页设置
-1. 点击扩展面板底部的设置图标
-2. 在弹出的设置菜单中，切换"在新标签页打开"选项
-3. 开启后，点击平台将在新标签页打开搜索结果；关闭则在当前标签页打开
+English | [中文](./README-zh.md)
 
-### 自定义平台
-1. 点击"添加自定义平台"按钮
-2. 填写平台名称和URL模板，URL模板中使用`{searchTerm}`作为搜索词占位符
-3. 可选择上传平台图标
-4. 点击"保存"添加自定义平台
+Quickly switch search engines via the extension button without having to re-enter your search terms.
 
-### 编辑平台
-1. 点击任意平台右上角的编辑图标
-2. 修改平台信息
-3. 点击"更新"保存更改，或点击"删除"移除该平台
-4. 对于默认平台，删除操作将隐藏该平台，可通过设置菜单恢复
+![](https://github.com/user-attachments/assets/b65adf99-456a-42b4-a703-d0e9ebb2be6c)
 
-### 恢复默认平台
-1. 点击扩展面板底部的设置图标
-2. 在弹出的设置菜单中，点击"恢复已删除的默认平台"
-3. 所有之前删除的默认平台将被恢复
 
-### 平台排序
-1. 长按平台左侧的拖动图标
-2. 拖动平台到所需位置
-3. 释放鼠标完成排序，排序结果会自动保存
+## Usage
+Before use it, load the unpacked extension in developer mode to install.
 
-### 悬浮入口使用
-1. 在支持的搜索网站上，浏览器边缘会显示悬浮按钮
-2. 可以通过拖拽调整悬浮按钮在浏览器边缘的位置
-3. 点击悬浮按钮即可打开搜索切换面板
-4. 悬浮按钮不会影响正常浏览，只在需要时出现
+Pin this extension in the extension bar is suggested.
 
-## 技术特点
-- 使用现代JavaScript模块化设计，提高代码可维护性
-- DOM缓存优化，提升性能
-- 使用Chrome Storage API保存用户设置和自定义平台
-- 支持拖拽排序功能
-- 自动识别当前搜索平台和搜索词
-- 悬浮入口使用CSS动画和拖拽功能，确保良好的用户体验
-- 统一的错误处理机制，提高应用稳定性
-- 优化的事件处理系统，防止内存泄漏
-- 流畅的动画效果，增强用户交互体验
-- CSS样式优化，支持暗黑模式和统一风格
+When you want to switch to another engine, just click the extension icon and select an engine.
 
-## 隐私说明
-- 所有数据仅存储在用户本地，不会上传到任何服务器
-- 仅请求访问搜索网站的权限以识别搜索词和平台
-- 不会收集任何用户的搜索历史或个人信息
+If the search engine and search term are not currently recognized, the homepage of the search engine will be opened in a new tab.
 
-## 兼容性
-- 支持Chrome 88及以上版本
-- 支持基于Chromium的浏览器（如Edge、Brave等）
-- 适配深色模式，根据系统主题自动切换界面风格
+## Configuration
 
-## 问题反馈
-如果您在使用过程中遇到任何问题或有功能建议，请通过Issues页面反馈。 
+Just modify platform.json to the search engine you want.
+
+Here is a example platform:
+
+```json
+{
+	"id": "google",
+	"name": "Google",
+	"iconUrl": "icon/google.svg",
+	"urlTemplate": "https://www.google.com/search?q={searchTerm}",
+	"searchParam": "q",
+	"matchDomains": ["www.google.com", "www.google.com.hk"],
+	"homePage": "https://www.google.com"
+}
+```
+
+- `id` seems to have no effect now, but it is better to keep it.
+- `name` indicates the name to be displayed in the extension popup.
+- `iconUrl` can be a local or remote URL.
+- `urlTemplate` indicates the URL format when you switch to another platforms.
+- `searchParam` indicates the search param for identifying the current platform' search term.
+- `matchDomains` means that if the platform has multiple domain, they can all be identified correctly.
+- `homePage` as the name( 
+
+## Privacy statement (by original author)
+- All data is stored only locally on the user and will not be uploaded to any server
+- Only permission to access the search site is requested to identify search terms and platforms
+- No user's search history or personal information will be collected
+
+## At Last
+
+Have a nice day.
+
+~~If some **mysterious oriental characters** of this extension name or popup are confusing you, just modify them into your own language.~~
+
+~~These **strings were hardcoded in Chinese** in mainfest.json, popup.html and popup.js (Especially Line 1217/1225)~~
+
+
+
+
+
+
+
+
+
+

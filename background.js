@@ -1,55 +1,119 @@
-// 后台服务模块
+// 背景服务模块（保持持久状态）
 const BackgroundService = (() => {
-  // 处理安装或更新事件
-  const handleInstalled = (details) => {
-    console.log('搜索切换插件已安装或更新', details);
+  // tabId -> { targetUrl, lastUrl }
+  const tabData = new Map();
+  let currentActiveTabId = null;
+
+  // 页面开始导航
+  const handleBeforeNavigate = (details) => {
+    if (details.frameId === 0) {
+      tabData.set(details.tabId, {
+        targetUrl: details.url,
+        lastUrl: details.url
+      });
+
+      if (details.tabId === currentActiveTabId) {
+        console.log('[导航开始]', details.url);
+      }
+    }
   };
 
-  // 处理消息
+  // URL 确定（包括 hash / SPA）
+  const handleCommitted = (details) => {
+    if (details.frameId === 0 && tabData.has(details.tabId)) {
+      const data = tabData.get(details.tabId);
+      data.lastUrl = details.url;
+
+      if (details.tabId === currentActiveTabId) {
+        console.log('[URL变化]', details.url);
+      }
+    }
+  };
+
+  // 激活标签页
+  const handleTabActivated = ({ tabId }) => {
+    currentActiveTabId = tabId;
+    chrome.tabs.get(tabId, (tab) => {
+      const data = tabData.get(tabId) || {};
+      const displayUrl = data.targetUrl || tab.url;
+      if (displayUrl && !displayUrl.startsWith('chrome://')) {
+        console.log('[切换标签页]', displayUrl);
+      }
+    });
+  };
+
+  // 实时监听 URL 更新
+  const handleTabUpdated = (tabId, changeInfo) => {
+    if (tabId === currentActiveTabId && changeInfo.url) {
+      const data = tabData.get(tabId) || {};
+      data.lastUrl = changeInfo.url;
+      tabData.set(tabId, data);
+      console.log('[实时更新]', changeInfo.url);
+    }
+  };
+
+  // 标签页关闭
+  const handleTabRemoved = (tabId) => {
+    tabData.delete(tabId);
+  };
+
+  // 前端路由（SPA）变化通知
+  const handleSpaUrlChange = (msg, sender) => {
+    if (msg.url && sender.tab?.id) {
+      const data = tabData.get(sender.tab.id) || {};
+      data.lastUrl = msg.url;
+      tabData.set(sender.tab.id, data);
+
+      if (sender.tab.id === currentActiveTabId) {
+        console.log('[前端路由变化]', msg.url);
+      }
+    }
+  };
+
+  // 响应 popup 请求 URL
+  const handlePopupRequest = (sendResponse) => {
+    const data = tabData.get(currentActiveTabId);
+    const url = data?.lastUrl || '';
+    console.log('[popup 请求当前 URL]', url);
+    sendResponse({ url });
+  };
+
+  // 通用消息分发器（单一监听器 ✅ 避免连接错误）
   const handleMessage = (message, sender, sendResponse) => {
-    if (message.action === 'getSearchInfo') {
-      // 返回当前标签页的信息
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs.length === 0) {
-          sendResponse({ success: false });
-          return;
-        }
-        
-        sendResponse({
-          success: true,
-          url: tabs[0].url
-        });
-      });
-      
-      // 返回true表示异步响应
-      return true;
+    if (message.type === 'url_change') {
+      handleSpaUrlChange(message, sender);
+      return false; // 非异步
     }
+
+    if (message.type === 'get_current_url') {
+      handlePopupRequest(sendResponse);
+      return true; // 异步响应
+    }
+
+    return false; // 忽略其它类型
   };
 
-  // 处理与popup的连接
-  const handleConnect = (port) => {
-    if (port.name === 'popup') {
-      // 连接开始
-      console.log('popup页面已打开');
-      
-      // 当连接关闭时
-      port.onDisconnect.addListener(() => {
-        console.log('popup页面已关闭');
-        // 这里清理任何相关的状态
-      });
-    }
-  };
-
-  // 初始化后台服务
+  // 初始化服务
   const initialize = () => {
-    // 监听安装或更新事件
-    chrome.runtime.onInstalled.addListener(handleInstalled);
-    
-    // 监听消息
+    chrome.webNavigation.onBeforeNavigate.addListener(handleBeforeNavigate);
+    chrome.webNavigation.onCommitted.addListener(handleCommitted);
+    chrome.tabs.onActivated.addListener(handleTabActivated);
+    chrome.tabs.onUpdated.addListener(handleTabUpdated);
+    chrome.tabs.onRemoved.addListener(handleTabRemoved);
     chrome.runtime.onMessage.addListener(handleMessage);
-    
-    // 监听与popup的连接
-    chrome.runtime.onConnect.addListener(handleConnect);
+
+    chrome.runtime.onInstalled.addListener((details) => {
+      console.log('扩展已安装或更新', details);
+    });
+
+    chrome.runtime.onConnect.addListener((port) => {
+      if (port.name === 'popup') {
+        console.log('popup 页面已打开');
+        port.onDisconnect.addListener(() => {
+          console.log('popup 页面已关闭');
+        });
+      }
+    });
   };
 
   return {
@@ -57,12 +121,4 @@ const BackgroundService = (() => {
   };
 })();
 
-// 初始化后台服务
 BackgroundService.initialize();
-
-// 添加监听器，在弹出窗口打开前重置状态
-chrome.action.onClicked.addListener(() => {
-  // 这个事件在点击扩展图标时触发
-  // 注意：只有当没有设置popup的时候才会触发
-  // 所以我们需要在popup.js中处理状态重置
-}); 

@@ -1,3 +1,25 @@
+// === 增量追加：监听前端 URL 路由变化（支持 SPA） ===
+(function() {
+  const notifyUrlChange = () => {
+    chrome.runtime.sendMessage({
+      type: 'url_change',
+      url: location.href
+    });
+  };
+
+  ['pushState', 'replaceState'].forEach(method => {
+    const original = history[method];
+    history[method] = function () {
+      const result = original.apply(this, arguments);
+      notifyUrlChange();
+      return result;
+    };
+  });
+
+  window.addEventListener('hashchange', notifyUrlChange);
+})();
+
+/*
 // 内容脚本模块
 const ContentScript = (() => {
   // 私有变量
@@ -222,59 +244,26 @@ const ContentScript = (() => {
     const url = window.location.href;
     console.log("当前URL:", url);
   
-    // 京东特殊处理
-    if (url.includes("search.jd.com")) {
-      console.log("检测到京东搜索页面");
-      return true;
-    }
-    
-    // 淘宝特殊处理
-    if (url.includes("s.taobao.com") || url.includes("taobao.com/list/product")) {
-      console.log("检测到淘宝搜索页面");
-      return true;
-    }
-    
-    // 豆瓣特殊处理
-    if (url.includes("douban.com") && 
-        (url.includes("search") || url.includes("subject_search"))) {
-      console.log("检测到豆瓣搜索页面");
-      return true;
-    }
   
     const supportedPlatforms = [
       // 各种搜索平台配置
       { name: 'Google', pattern: /google\.com\/(search|imghp|images|videos)/, param: 'q' },
+      { name: 'Google HK', pattern: /google\.com.hk\/(search|imghp|images|videos)/, param: 'q' },
       { name: 'Bing', pattern: /bing\.com\/(search|images|videos|news)/, param: 'q' },
+      { name: 'Bing CN', pattern: /bing\.com\/(search|images|videos|news)/, param: 'q' },
       { name: 'Baidu', pattern: /baidu\.com\/s/, param: 'wd' },
       { name: 'Baidu Images', pattern: /image\.baidu\.com/, param: 'word' },
       { name: 'Baidu Videos', pattern: /video\.baidu\.com/, param: 'word' },
-      { name: 'Zhihu', pattern: /zhihu\.com\/search/, param: 'q' },
-      { name: 'SMZDM', pattern: /search\.smzdm\.com/, param: 's' },
-      { name: 'Xiaohongshu', pattern: /xiaohongshu\.com\/search_result/, param: 'keyword' },
-      { name: 'YouTube', pattern: /youtube\.com\/results/, param: 'search_query' },
-      { name: 'Bilibili', pattern: /bilibili\.com\/search/, param: 'keyword' },
-      { name: 'Bilibili Search', pattern: /search\.bilibili\.com/, param: 'keyword' },
-      { name: 'Douyin', pattern: /douyin\.com\/search\//, param: null },
+	  { name: '360', pattern: /so\.com\/s/, param: 'q' },
+	  { name: 'Sogou', pattern: /sogou\.com\/web/, param: 'query' },
+	  { name: 'Yahoo', pattern: /yahoo\.com\/search/, param: 'p' },
+	  { name: 'DuckDuckGo', pattern: /duckduckgo\.com\//, param: 'q' },
+
+
+
       
-      // 淘宝搜索平台
-      { name: 'Taobao Search', pattern: /s\.taobao\.com\/search/, param: 'q' },
-      { name: 'Taobao Search', pattern: /s\.taobao\.com/, param: null },
-      { name: 'Taobao Product', pattern: /taobao\.com\/list\/product/, param: null },
-      { name: 'Taobao', pattern: /taobao\.com\/search/, param: 'q' },
       
-      // 京东搜索平台
-      { name: 'JD Search', pattern: /search\.jd\.com\/Search/, param: 'keyword' },
-      { name: 'JD Search', pattern: /search\.jd\.com/, param: null },
-      
-      // 豆瓣搜索平台
-      { name: 'Douban', pattern: /douban\.com\/search/, param: 'q' },
-      { name: 'Douban Movie', pattern: /movie\.douban\.com\/subject_search/, param: 'search_text' },
-      { name: 'Douban Book', pattern: /book\.douban\.com\/subject_search/, param: 'search_text' },
-      { name: 'Douban Music', pattern: /music\.douban\.com\/subject_search/, param: 'search_text' },
-      { name: 'Douban Subject', pattern: /www\.douban\.com\/subject_search/, param: 'search_text' },
-      { name: 'Douban Movie Search', pattern: /movie\.douban\.com\/search\//, param: null },
-      { name: 'Douban Book Search', pattern: /book\.douban\.com\/search\//, param: null },
-      { name: 'Douban Music Search', pattern: /music\.douban\.com\/search\//, param: null }
+
     ];
     
     for (const platform of supportedPlatforms) {
@@ -357,3 +346,5 @@ window.addEventListener('load', () => {
   ContentScript.initialize();
   ContentScript.setupUrlChangeListener();
 }); 
+
+*/

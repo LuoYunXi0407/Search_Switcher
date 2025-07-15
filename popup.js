@@ -8,7 +8,9 @@ const DEFAULT_PLATFORMS = [
     iconUrl: "icon/google.svg",
     urlTemplate: "https://www.google.com/search?q={searchTerm}",
     searchParam: "q",
-    urlPattern: "*://www.google.com/search*"
+    //urlPattern: "*://www.google.com/search*",
+	matchDomains: ["www.google.com", "www.google.com.hk"],
+	homePage: "https://www.google.com"
   },
   {
     id: "bing",
@@ -16,7 +18,9 @@ const DEFAULT_PLATFORMS = [
     iconUrl: "icon/bing.svg",
     urlTemplate: "https://www.bing.com/search?q={searchTerm}",
     searchParam: "q",
-    urlPattern: "*://www.bing.com/search*"
+    //urlPattern: "*://www.bing.com/search*",
+	matchDomains: ["www.bing.com", "cn.bing.com"],
+	homePage: "https://www.bing.com"
   },
   {
     id: "baidu",
@@ -24,80 +28,51 @@ const DEFAULT_PLATFORMS = [
     iconUrl: "icon/Baidu.svg",
     urlTemplate: "https://www.baidu.com/s?wd={searchTerm}",
     searchParam: "wd",
-    urlPattern: "*://www.baidu.com/s*"
+    //urlPattern: "*://www.baidu.com/s*",
+	matchDomains: ["www.baidu.com"],
+	homePage: "https://www.baidu.com"
   },
   {
-    id: "youtube",
-    name: "YouTube",
-    iconUrl: "icon/Youtube.svg",
-    urlTemplate: "https://www.youtube.com/results?search_query={searchTerm}",
-    searchParam: "search_query",
-    urlPattern: "*://www.youtube.com/results*"
-  },
-  {
-    id: "bilibili",
-    name: "哔哩哔哩",
-    iconUrl: "icon/bilibili.svg",
-    urlTemplate: "https://search.bilibili.com/all?keyword={searchTerm}",
-    searchParam: "keyword",
-    urlPattern: "*://search.bilibili.com/*"
-  },
-  {
-    id: "xiaohongshu",
-    name: "小红书",
-    iconUrl: "icon/小红书.svg",
-    urlTemplate: "https://www.xiaohongshu.com/search_result?keyword={searchTerm}",
-    searchParam: "keyword",
-    urlPattern: "*://www.xiaohongshu.com/search_result*"
-  },
-  {
-    id: "douyin",
-    name: "抖音",
-    iconUrl: "icon/抖音.svg",
-    urlTemplate: "https://www.douyin.com/search/{searchTerm}",
-    searchParam: null,
-    urlPattern: "*://www.douyin.com/search/*"
-  },
-  {
-    id: "smzdm",
-    name: "什么值得买",
-    iconUrl: "icon/smzdm.svg",
-    urlTemplate: "https://search.smzdm.com/?s={searchTerm}",
-    searchParam: "s",
-    urlPattern: "*://search.smzdm.com/*"
-  },
-  {
-    id: "taobao",
-    name: "淘宝",
-    iconUrl: "icon/淘宝.svg",
-    urlTemplate: "https://s.taobao.com/search?q={searchTerm}",
+    id: "360",
+    name: "360",
+    iconUrl: "icon/360.ico",
+    urlTemplate: "https://www.so.com/s?q={searchTerm}",
     searchParam: "q",
-    urlPattern: "*://s.taobao.com/search*"
+    //urlPattern: "*://www.so.com/s*",
+	matchDomains: ["www.so.com"],
+	homePage: "https://www.so.com"
   },
   {
-    id: "jd",
-    name: "京东",
-    iconUrl: "icon/京东.svg",
-    urlTemplate: "https://search.jd.com/Search?keyword={searchTerm}",
-    searchParam: "keyword",
-    urlPattern: "*://search.jd.com/Search*"
+    id: "sogou",
+    name: "搜狗",
+    iconUrl: "icon/sogou.ico",
+    urlTemplate: "https://www.sogou.com/web?query={searchTerm}",
+    searchParam: "query",
+    //urlPattern: "*://www.sogou.com/web*",
+	matchDomains: ["www.sogou.com"],
+	homePage: "https://www.sogou.com"
   },
   {
-    id: "zhihu",
-    name: "知乎",
-    iconUrl: "icon/知乎.svg",
-    urlTemplate: "https://www.zhihu.com/search?q={searchTerm}",
-    searchParam: "q",
-    urlPattern: "*://www.zhihu.com/search*"
+    id: "yahoo",
+    name: "Yahoo",
+    iconUrl: "icon/yahoo.ico",
+    urlTemplate: "https://search.yahoo.com/search?p={searchTerm}",
+    searchParam: "p",
+    //urlPattern: "*://search.yahoo.com/search*",
+	matchDomains: ["search.yahoo.com"],
+	homePage: "https://search.yahoo.com"
   },
   {
-    id: "douban",
-    name: "豆瓣",
-    iconUrl: "icon/豆瓣.svg",
-    urlTemplate: "https://www.douban.com/search?q={searchTerm}",
-    searchParam: "q",
-    urlPattern: "*://www.douban.com/search*"
+    id: "duckduckgo",
+    name: "DuckDuckGo",
+    iconUrl: "icon/duckduckgo.ico",
+    urlTemplate: "https://duckduckgo.com/?q={searchTerm}",
+    searchParam: "p",
+    //urlPattern: "*://duckduckgo.com/*",
+	matchDomains: ["duckduckgo.com"],
+	homePage: "https://duckduckgo.com"
   }
+  
 ];
 
   let allPlatforms = [];
@@ -114,13 +89,14 @@ const DEFAULT_PLATFORMS = [
       
       // 加载内置平台
       try {
-        const builtinPlatformsResponse = await fetch('data/platforms.json');
+        const builtinPlatformsResponse = await fetch(chrome.runtime.getURL('platforms.json'));
         const builtinPlatforms = await builtinPlatformsResponse.json();
         
-        // 为内置平台添加id
+		console.log(builtinPlatforms);
+        /*// 为内置平台添加id
         builtinPlatforms.forEach((platform, index) => {
           platform.id = 'builtin-' + index;
-        });
+        });*/
         
         // 使用读取到的平台数据替换默认平台
         allPlatforms = [...builtinPlatforms];
@@ -129,7 +105,7 @@ const DEFAULT_PLATFORMS = [
         // 保持默认平台数据不变
         allPlatforms = [...defaultPlatforms];
       }
-      
+      /*
       // 加载用户修改的预设平台
       const modifiedData = await chrome.storage.local.get('modifiedDefaultPlatforms');
       const modifiedPlatforms = modifiedData.modifiedDefaultPlatforms || [];
@@ -158,9 +134,10 @@ const DEFAULT_PLATFORMS = [
       // 加载自定义平台
       const data = await chrome.storage.local.get('customPlatforms');
       const customPlatforms = data.customPlatforms || [];
+	 */
       
       // 合并平台
-      allPlatforms = [...allPlatforms, ...customPlatforms];
+      //allPlatforms = [...allPlatforms, ...customPlatforms];
       console.log('已加载平台数量:', allPlatforms.length);
     } catch (error) {
       console.error('加载平台数据失败:', error);
@@ -307,7 +284,21 @@ const DEFAULT_PLATFORMS = [
       // 查找匹配的平台
       for (const platform of allPlatforms) {
         try {
-          let platformUrl = platform.urlTemplate.replace('{searchTerm}', '');
+			if (platform.matchDomains && platform.matchDomains.includes(domain)) {
+  currentPlatformId = platform.id;
+
+  // 提取搜索词
+  if (platform.searchParam) {
+    const urlObj = new URL(url);
+    currentSearchTerm = urlObj.searchParams.get(platform.searchParam) || '';
+  } 
+
+  console.log('当前平台已识别:', platform.name, '搜索词:', currentSearchTerm);
+  return;
+}
+
+			
+          /*let platformUrl = platform.urlTemplate.replace('{searchTerm}', '');
           // 确保URL有协议前缀
           if (!platformUrl.startsWith('http')) {
             platformUrl = 'https://' + platformUrl;
@@ -333,7 +324,7 @@ const DEFAULT_PLATFORMS = [
             
             console.log('当前平台已识别:', platform.name, '搜索词:', currentSearchTerm);
             return;
-          }
+          }*/
         } catch (e) {
           console.warn('平台URL模板解析失败:', platform.name, e);
           continue;
@@ -356,7 +347,11 @@ const DEFAULT_PLATFORMS = [
     try {
       // 如果没有搜索词，无法进行切换
       if (!currentSearchTerm) {
-        alert('未能获取当前搜索词，无法切换平台');
+        //alert('未能获取当前搜索词，无法切换平台');
+		
+		await chrome.tabs.create({ url: platform.homePage });
+		window.close();
+		
         return;
       }
       
@@ -374,15 +369,17 @@ const DEFAULT_PLATFORMS = [
       const targetUrl = platform.urlTemplate.replace('{searchTerm}', encodeURIComponent(currentSearchTerm));
       
       // 根据设置决定在新标签页打开还是当前标签页
-      const settings = await SettingsManager.getSettings();
+      //const settings = await SettingsManager.getSettings();
       
-      if (settings.openInNewTab) {
+	  await chrome.tabs.update(tab.id, { url: targetUrl });
+	  //await chrome.tabs.create({ url: targetUrl });
+      /*if (settings.openInNewTab) {
         // 在新标签页打开
         await chrome.tabs.create({ url: targetUrl });
       } else {
         // 在当前标签页打开
         await chrome.tabs.update(tab.id, { url: targetUrl });
-      }
+      }*/
       
       // 关闭弹出窗口
       window.close();
@@ -618,7 +615,7 @@ const SettingsManager = (() => {
   
   // 获取设置
   const loadSettings = async () => {
-    try {
+    /*try {
       const data = await chrome.storage.local.get('settings');
       if (data.settings) {
         settings = {...defaultSettings, ...data.settings};
@@ -628,7 +625,8 @@ const SettingsManager = (() => {
     } catch (error) {
       console.error('加载设置失败:', error);
       return defaultSettings;
-    }
+    }*/
+	return defaultSettings;
   };
   
   // 保存设置
@@ -658,6 +656,7 @@ const SettingsManager = (() => {
     getSettings: () => ({...settings})
   };
 })();
+
 
 // 工具函数模块
 const Utils = (() => {
@@ -790,7 +789,7 @@ const state = {
   allPlatforms: [],
   currentSearchTerm: '',  // 添加搜索词状态
   currentEditingPlatform: null,
-  draggedItem: null,
+  //draggedItem: null,
   settings: {
     openInNewTab: false,
   },
@@ -1122,13 +1121,13 @@ const UIController = (() => {
     element.style.width = 'calc(50% - 6px)';
     
     // 添加拖拽属性
-    element.draggable = true;
+    /*element.draggable = true;
     element.addEventListener('dragstart', handleDragStart);
     element.addEventListener('dragover', handleDragOver);
     element.addEventListener('dragenter', handleDragEnter);
     element.addEventListener('dragleave', handleDragLeave);
     element.addEventListener('drop', handleDrop);
-    element.addEventListener('dragend', handleDragEnd);
+    element.addEventListener('dragend', handleDragEnd);*/
     
     // 拖拽图标
     const dragIcon = document.createElement('div');
@@ -1151,7 +1150,7 @@ const UIController = (() => {
     contentElement.appendChild(iconElement);
     contentElement.appendChild(nameElement);
     
-    element.appendChild(dragIcon);
+    //element.appendChild(dragIcon);
     element.appendChild(contentElement);
     
     // 为所有平台添加编辑按钮，不再限制只有自定义平台
@@ -1161,6 +1160,28 @@ const UIController = (() => {
       const editButton = document.createElement('button');
       editButton.className = 'action-btn edit-btn';
       editButton.title = '编辑';
+	  
+	  const addButton = document.createElement('button');
+      addButton.className = 'action-btn add-btn';
+      addButton.title = '新标签页打开';
+	  
+	  const addIcon = document.createElement('div');
+    addIcon.className = 'add-icon';
+    addIcon.innerHTML = '+';
+	addIcon.alt = "新标签页打开";
+	addButton.appendChild(addIcon);
+	
+	
+	  
+	  /*const homeButton = document.createElement('button');
+      homeButton.className = 'action-btn home-btn';
+      homeButton.title = '打开主页';
+	  
+	  const homeIcon = document.createElement('div');
+    homeIcon.className = 'home-icon';
+	  homeIcon.innerHTML = '🏠';
+	  homeIcon.alt = "打开主页";
+	  homeButton.appendChild(homeIcon);*/
       
       // 使用edit.svg图标
       const editIcon = document.createElement('img');
@@ -1174,7 +1195,10 @@ const UIController = (() => {
       prepareEditPlatform(platform);
       });
       
-      actionsElement.appendChild(editButton);
+	  //actionsElement.appendChild(homeButton);
+	  //actionsElement.appendChild(addButton);
+	  
+      //actionsElement.appendChild(editButton);
       element.appendChild(actionsElement);
     
     if (!isCurrent) {
@@ -1390,7 +1414,24 @@ const UIController = (() => {
     resetPopupState
   };
 })();
+async function getCurrentUrlWithFallback() {
+  // 尝试从 background 获取
+  const urlFromBackground = await new Promise((resolve) => {
+    chrome.runtime.sendMessage({ type: "get_current_url" }, (response) => {
+      if (chrome.runtime.lastError || !response?.url) {
+        resolve(null);
+      } else {
+        resolve(response.url);
+      }
+    });
+  });
 
+  if (urlFromBackground) return urlFromBackground;
+
+  // fallback: 从 tabs 获取（不一定是 SPA 最新 URL，但能保证有值）
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  return tab?.url || '';
+}
 // 初始化应用
 async function init() {
   try {
@@ -1398,8 +1439,13 @@ async function init() {
     UIController.cacheDOMElements();
     
     // 获取当前选项卡的URL
-    const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-    const url = tab ? tab.url : '';
+    /*const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+    const url = tab ? tab.url : '';*/
+	
+	const url = await getCurrentUrlWithFallback();
+
+
+
     
     // 获取所有平台数据
     await PlatformManager.loadAllPlatforms();
