@@ -62,5 +62,15 @@
 		"matchDomains": ["duckduckgo.com"],
 		"homePage": "https://duckduckgo.com"
 		
+	},
+	{
+		"id": "douyin",
+		"name": "Douyin",
+		"iconUrl": "icon/抖音.svg",
+		"urlTemplate": "https://www.douyin.com/search/{searchTerm}",
+		"searchParam": null,
+		"matchDomains": ["www.douyin.com"],
+		"homePage": "https://www.douyin.com"
+		
 	}
 ]

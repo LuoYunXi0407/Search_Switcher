@@ -288,10 +288,37 @@ const DEFAULT_PLATFORMS = [
   currentPlatformId = platform.id;
 
   // 提取搜索词
-  if (platform.searchParam) {
+  if (platform.searchParam ) {
+	  //console.log("awsl"+platform.searchParam);
+	  // 我去我真 tmd 有病吧，自己写的 platform.searchParam 是 "null"，我还以为是 null
     const urlObj = new URL(url);
     currentSearchTerm = urlObj.searchParams.get(platform.searchParam) || '';
   } 
+  else {
+	  //console.log("llovelyc");
+	  try {
+    const urlPath = new URL(url).pathname;
+    const templatePath = decodeURIComponent(new URL(platform.urlTemplate.startsWith('http') ? platform.urlTemplate : 'https://' + platform.urlTemplate).pathname);
+	// tmd 这个地方要decodeURIComponent()，要不然 { 和 } 转译成 %7B 和 %7D 就寄了
+    const urlParts = urlPath.split('/').filter(Boolean);
+    const templateParts = templatePath.split('/').filter(Boolean);
+	console.log("tall:"+templateParts)
+
+    for (let i = 0; i < templateParts.length; i++) {
+		//console.log(i);
+		//console.log(templateParts[i]);
+		//console.log(templateParts[i] === '{searchTerm}');
+      if (templateParts[i] === '{searchTerm}') {
+		  
+		  currentSearchTerm = decodeURIComponent(urlParts[i] || '');
+		  break;
+      }
+    }
+  } catch (e) {
+    console.warn('提取搜索词失败:', e);
+  }
+
+  }
 
   console.log('当前平台已识别:', platform.name, '搜索词:', currentSearchTerm);
   return;

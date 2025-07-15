@@ -52,7 +52,7 @@ Here is a example platform:
 - `name` indicates the name to be displayed in the extension popup.
 - `iconUrl` can be a local or remote URL.
 - `urlTemplate` indicates the URL format when you switch to another platforms.
-- `searchParam` indicates the search param for identifying the current platform' search term.
+- `searchParam` can be a string or `null`, which indicates the search param for identifying the current platform' search term. If `searchParam === null`, the search term will parsing via `urlTemplate`.
 - `matchDomains` means that if the platform has multiple domain, they can all be identified correctly.
 - `homePage` as the name( 
 
